@@ -1,0 +1,29 @@
+from paho.mqtt import client as mqtt_client
+
+# Configuration du broker MQTT
+BROKER = "broker.emqx.io"     # Remplace par l'adresse IP ou DNS de ton broker
+PORT = 1883              # Port MQTT par défaut
+TOPIC = "/#"              # '#' = tous les topics
+
+# Fonction appelée à la connexion
+def on_connect(client, userdata, flags, rc, properties=None):
+    print(f"[INFO] Connecté au broker avec le code de retour {rc}")
+    client.subscribe(TOPIC)
+    print(f"[INFO] Abonné au topic : {TOPIC}")
+
+# Fonction appelée à la réception d’un message
+def on_message(client, userdata, msg):
+    print(f"[MESSAGE] Topic: {msg.topic} | Payload: {msg.payload.decode()}")
+
+# Initialisation du client
+client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2)
+client.on_connect = on_connect
+client.on_message = on_message
+
+try:
+    client.connect(BROKER, PORT, 60)
+    print(f"[INFO] Connexion au broker {BROKER}:{PORT}...")
+    client.loop_forever()
+except Exception as e:
+    print(f"Erreur de {e}")
+    pass
